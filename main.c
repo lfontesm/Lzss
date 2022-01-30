@@ -7,9 +7,10 @@ int main(int argc, char **argv){
     }
     
     o_file *file_content = read_file(argv[1]);
-    // puts(file_content->buffer);
-    lzss(file_content);
+    char *compressed_buffer = lzss(file_content);
+    puts(compressed_buffer);
 
     destroy_file(file_content);
+    free(compressed_buffer);
     return 0;
 }

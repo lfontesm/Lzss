@@ -2,6 +2,7 @@
 
 #define MAX_SLIDING_WINDOW_SIZE 4096
 #define MIN_CHAR_PER_TOKEN_SIZE 3
+#define MAX_MATCHING_LENGTH 5
 
 // TODO: Try to implement a minimum lenght for a token
 
@@ -12,32 +13,12 @@ typedef struct {
     size_t offset;
 } sliding_window;
 
-int elements_in_array(char *check_elements, char *elements, int filter_last_char) {
-    int offset = 0;
-    int chk_len;
-    if (filter_last_char)
-        chk_len = strlen(check_elements) - 1;
-    else
-        chk_len = strlen(check_elements);
-    for (int i = 0; i < strlen(elements); i++) {
-        if (chk_len <= offset) 
-            return i - chk_len;
-
-        if (check_elements[offset] == elements[i])
-            offset++;
-        else
-            offset = 0;
-    }
-    return -1;
-}
-
 void iter_window(char *buf, char *out_buf, sliding_window *s_w, int len, int *pos) {
     s_w->currently_matched = 0;
     s_w->offset=0;
-    int fin = 0;
     
-    for (int i = s_w->init; i < *pos - 1; i++){
-        fin = 0;
+    for (int i = s_w->init; ((i < *pos - 1) && (s_w->size > *pos - s_w->init)); i++){
+        int fin = 0;
         if (buf[i] == buf[*pos]){
             fin = 1;
             s_w->currently_matched++;
@@ -76,7 +57,5 @@ char *lzss(o_file *f){
         if ((i + s_w.init) >= s_w.size)
             s_w.init++;
     }
-    puts(out_buf);
-    free(out_buf);
-    return "a";
+    return out_buf;
 }

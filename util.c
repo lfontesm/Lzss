@@ -1,34 +1,8 @@
 #include "util.h"
 
-char *replace(char *s, char t, char r) {
-    while (*s++)
-        if (*s == t){
-            *s = r;
-            return s;
-        }
-    return s;
-}
-
-int elem(char c, char *buf) {
-    for (int i = 0; i < strlen(buf); i++) {
-        if (buf[i] == c)
-            return i;
-    }
-    return -1;
-}
-
 void strapnd(char *buf, char c) {
     while (*buf++);
     *--buf = c;
-}
-
-void strshl(char *buf, int p) {
-    int buf_len = strlen(buf);
-    // char last_c = buf[buf_len - 1];
-
-    for (int i = p; i<buf_len-1; i++) {
-        buf[p] = buf[p+1];
-    }
 }
 
 o_file *open_file(char *file_name) {
@@ -75,7 +49,7 @@ o_file *read_file(char *file_name) {
         perror("Failed to read target file");
         exit(1);
     }
-    replace(f->buffer, '\n', '\0');
+    // replace(f->buffer, '\n', '\0');
 
     return f;
 }
