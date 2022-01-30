@@ -52,13 +52,15 @@ void iter_window(sliding_window *s_w, char *buf, int len, int *pos){
             }
             if (fin) {
                 char token[14];
-                off_t offset = *pos - s_w->init;
+                off_t offset = *pos - i;
                 *pos = aux_pos;
                 sprintf(token, "<%ld, %ld>", offset, s_w->currently_matched);
                 puts(token);
+                return;
             }
         }
         s_w->offset++;
+        s_w->currently_matched = 0;
     }
 }
 
