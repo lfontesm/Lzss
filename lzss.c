@@ -1,6 +1,9 @@
 #include "lzss.h"
 
 #define MAX_SLIDING_WINDOW_SIZE 4096
+#define MIN_CHAR_PER_TOKEN_SIZE 3
+
+// TODO: Try to implement a minimum lenght for a token
 
 typedef struct {
     size_t size;
@@ -28,52 +31,52 @@ int elements_in_array(char *check_elements, char *elements, int filter_last_char
     return -1;
 }
 
-void iter_window(sliding_window *s_w, char *buf, int len, int *pos){
+void iter_window(char *buf, char *out_buf, sliding_window *s_w, int len, int *pos) {
     s_w->currently_matched = 0;
     s_w->offset=0;
     int fin = 0;
-    // char current_char = buf[*pos];
     
     for (int i = s_w->init; i < *pos - 1; i++){
+        fin = 0;
         if (buf[i] == buf[*pos]){
+            fin = 1;
             s_w->currently_matched++;
-            printf("FOUND AT %ld \\/\n", s_w->offset);
             int aux_pos = *pos + 1;
-            // return;
             for (int j = i+1; j < *pos; j++){
                 if (buf[j] != buf[aux_pos]){
                     break;
                 }
-                fin = 1;
                 aux_pos++;
                 s_w->currently_matched++;
                 s_w->offset++;
-                printf("BUT WAIT, THERES MORE\n");
             }
-            if (fin) {
-                char token[14];
+            if (fin && s_w->currently_matched > MIN_CHAR_PER_TOKEN_SIZE) {
                 off_t offset = *pos - i;
                 *pos = aux_pos;
-                sprintf(token, "<%ld, %ld>", offset, s_w->currently_matched);
-                puts(token);
+                sprintf(out_buf + strlen(out_buf), "<%ld, %ld>", offset, s_w->currently_matched);
                 return;
             }
         }
         s_w->offset++;
         s_w->currently_matched = 0;
     }
+
 }
 
 char *lzss(o_file *f){
     ssize_t buf_len = f->buf_size + 1;
-    sliding_window s_w = {.init=0, .offset=0, .currently_matched=0, .size=4096};
+    char *out_buf = malloc(buf_len * 2);
+    memset(out_buf, 0, buf_len*2);
+    sliding_window s_w = {.init=0, .offset=0, .currently_matched=0, .size=MAX_SLIDING_WINDOW_SIZE};
 
     for (int i=0; i<buf_len;i++) {
-        iter_window(&s_w, f->buffer, f->buf_size, &i);
-        printf("%c\n", f->buffer[i]);
+
+        iter_window(f->buffer, out_buf, &s_w, f->buf_size, &i);
+        strapnd(out_buf, f->buffer[i]);
         if ((i + s_w.init) >= s_w.size)
             s_w.init++;
     }
+    puts(out_buf);
+    free(out_buf);
     return "a";
-    
 }
