@@ -6,9 +6,10 @@ int main(int argc, char **argv){
         printf("%s <target_file_path>\n", argv[0]);
     }
     
-    char *file_content = read_file(argv[1]);
-    // puts(file_content);
+    o_file *file_content = read_file(argv[1]);
+    // puts(file_content->buffer);
     lzss(file_content);
-    free(file_content);
+
+    destroy_file(file_content);
     return 0;
 }
